@@ -26,15 +26,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
-#include <uart.h>
+#ifndef INCLUDE_UART_H_
+#define INCLUDE_UART_H_
 
-int main(void)
-{
-	while(1)
-	{
 
-	}
 
-	return 0;
-}
+#endif /* INCLUDE_UART_H_ */

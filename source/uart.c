@@ -26,15 +26,4 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
 #include <uart.h>
-
-int main(void)
-{
-	while(1)
-	{
-
-	}
-
-	return 0;
-}
