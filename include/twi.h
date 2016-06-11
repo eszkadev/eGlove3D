@@ -26,48 +26,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef INCLUDE_FRAME_H_
-#define INCLUDE_FRAME_H_
+#ifndef INCLUDE_TWI_H_
+#define INCLUDE_TWI_H_
 
 #include <inttypes.h>
 
-typedef struct Frame
-{
-	uint8_t FrameNr;
+#define SCL_CLOCK 40000UL
 
-	uint8_t PinkyZ;
-	uint8_t PinkyY;
-	uint8_t PinkyX;
+#define ACK 1
+#define NOACK 0
 
-	uint8_t RingZ;
-	uint8_t RingY;
-	uint8_t RingX;
+void twi_init(void);
+void twi_start(void);
+void twi_stop(void);
+void twi_write(uint8_t data);
+uint8_t twi_read(uint8_t ack);
 
-	uint8_t MiddleZ;
-	uint8_t MiddleY;
-	uint8_t MiddleX;
-
-	uint8_t IndexZ;
-	uint8_t IndexY;
-	uint8_t IndexX;
-
-	uint8_t ThumbZ;
-	uint8_t ThumbY;
-	uint8_t ThumbX;
-
-	uint8_t PalmY; // -Y !!!!!
-	uint8_t PalmZ;
-	uint8_t PalmX;
-
-	uint8_t Voltage1;
-	uint8_t Voltage2;
-
-	uint8_t MagX1;
-	uint8_t MagX2;
-	uint8_t MagY1;
-	uint8_t MagY2;
-	uint8_t MagZ1;
-	uint8_t MagZ2;
-} Frame;
-
-#endif /* INCLUDE_FRAME_H_ */
+#endif /* INCLUDE_TWI_H_ */

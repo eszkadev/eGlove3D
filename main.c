@@ -28,6 +28,7 @@
 
 #include <frame.h>
 #include <uart.h>
+#include <adxl345.h>
 #include <string.h>
 #include <util/delay.h>
 
@@ -37,15 +38,23 @@ Frame frame;
 
 int main(void)
 {
+	volatile uint16_t tmp;
+
 	// Clear frame
 	memset(&frame, 0, sizeof(Frame));
 
-	// Initialize UART
+	// Initialize components
 	uart_init();
+	adxl_init();
 
 	while(1)
 	{
-		frame.PalmX = frame.PalmX + 1;
+		tmp = adxl_receive(ADXL_X);
+		frame.PalmX = (tmp >> 5);
+		tmp = adxl_receive(ADXL_Y);
+		frame.PalmY = (tmp >> 5);
+		tmp = adxl_receive(ADXL_Z);
+		frame.PalmZ = (tmp >> 5);
 
 		send_frame(&frame);
 

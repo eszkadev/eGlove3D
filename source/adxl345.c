@@ -26,48 +26,86 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef INCLUDE_FRAME_H_
-#define INCLUDE_FRAME_H_
+#include <adxl345.h>
+#include <twi.h>
 
-#include <inttypes.h>
-
-typedef struct Frame
+void adxl_init(void)
 {
-	uint8_t FrameNr;
+	twi_init();
+	// Continuous measurement
+	adxl_transmit(0x2D, 0x08);
+	// Resolution
+	adxl_transmit(0x31, 0x00); // Full - 0x08
+	// Frequency of measurement (0x0A - 100Hz, 0x09 - 50Hz)
+	adxl_transmit(0x2C, 0x09);
+}
 
-	uint8_t PinkyZ;
-	uint8_t PinkyY;
-	uint8_t PinkyX;
+void adxl_transmit(uint8_t reg, uint8_t value)
+{
+	twi_start();
+	twi_write(ADXLW);
+	twi_write(reg);
+	twi_write(value);
+	twi_stop();
+}
 
-	uint8_t RingZ;
-	uint8_t RingY;
-	uint8_t RingX;
+uint16_t adxl_receive(uint8_t reg)
+{
+	uint16_t ret = 0;
+	uint16_t tmp;
+	switch (reg)
+	{
+	case ADXL_X:
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x32);
+		twi_start();
+		twi_write(ADXLR);
+		tmp = twi_read(0);
+		twi_stop();
 
-	uint8_t MiddleZ;
-	uint8_t MiddleY;
-	uint8_t MiddleX;
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x33);
+		twi_start();
+		twi_write(ADXLR);
+		ret = (twi_read(0) << 8) | tmp;
+		twi_stop();
+	break;
+	case ADXL_Y:
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x34);
+		twi_start();
+		twi_write(ADXLR);
+		tmp = twi_read(0);
+		twi_stop();
 
-	uint8_t IndexZ;
-	uint8_t IndexY;
-	uint8_t IndexX;
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x35);
+		twi_start();
+		twi_write(ADXLR);
+		ret = (twi_read(0) << 8) | tmp;
+		twi_stop();
+	break;
+	case ADXL_Z:
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x36);
+		twi_start();
+		twi_write(ADXLR);
+		tmp = twi_read(0);
+		twi_stop();
 
-	uint8_t ThumbZ;
-	uint8_t ThumbY;
-	uint8_t ThumbX;
-
-	uint8_t PalmY; // -Y !!!!!
-	uint8_t PalmZ;
-	uint8_t PalmX;
-
-	uint8_t Voltage1;
-	uint8_t Voltage2;
-
-	uint8_t MagX1;
-	uint8_t MagX2;
-	uint8_t MagY1;
-	uint8_t MagY2;
-	uint8_t MagZ1;
-	uint8_t MagZ2;
-} Frame;
-
-#endif /* INCLUDE_FRAME_H_ */
+		twi_start();
+		twi_write(ADXLW);
+		twi_write(0x37);
+		twi_start();
+		twi_write(ADXLR);
+		ret = (twi_read(0) << 8) | tmp;
+		twi_stop();
+	break;
+	}
+	return ret;
+}

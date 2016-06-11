@@ -26,48 +26,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef INCLUDE_FRAME_H_
-#define INCLUDE_FRAME_H_
+#include <twi.h>
+#include <avr/io.h>
 
-#include <inttypes.h>
-
-typedef struct Frame
+void twi_init(void)
 {
-	uint8_t FrameNr;
+	DDRC &= ~((1 << PC4) | (1 << PC5));
+	TWBR = ((F_CPU/SCL_CLOCK)-16)/2;
+}
 
-	uint8_t PinkyZ;
-	uint8_t PinkyY;
-	uint8_t PinkyX;
+void twi_start(void)
+{
+	TWCR = (1<<TWINT)|(1<<TWSTA)|(1<<TWEN);
+	while (!(TWCR & (1<<TWINT)));
+}
 
-	uint8_t RingZ;
-	uint8_t RingY;
-	uint8_t RingX;
+void twi_stop(void)
+{
+	TWCR = (1<<TWINT)|(1<<TWEN)|(1<<TWSTO);
+	while ((TWCR & (1<<TWSTO)));
+}
 
-	uint8_t MiddleZ;
-	uint8_t MiddleY;
-	uint8_t MiddleX;
+void twi_write(uint8_t data)
+{
+	TWDR = data;
+	TWCR = (1<<TWINT) | (1<<TWEN);
+	while (!(TWCR & (1<<TWINT)));
+}
 
-	uint8_t IndexZ;
-	uint8_t IndexY;
-	uint8_t IndexX;
+uint8_t twi_read(uint8_t ack)
+{
 
-	uint8_t ThumbZ;
-	uint8_t ThumbY;
-	uint8_t ThumbX;
-
-	uint8_t PalmY; // -Y !!!!!
-	uint8_t PalmZ;
-	uint8_t PalmX;
-
-	uint8_t Voltage1;
-	uint8_t Voltage2;
-
-	uint8_t MagX1;
-	uint8_t MagX2;
-	uint8_t MagY1;
-	uint8_t MagY2;
-	uint8_t MagZ1;
-	uint8_t MagZ2;
-} Frame;
-
-#endif /* INCLUDE_FRAME_H_ */
+	TWCR = ack
+	? ((1 << TWINT) | (1 << TWEN) | (1 << TWEA))
+	: ((1 << TWINT) | (1 << TWEN)) ;
+	while (!(TWCR & (1<<TWINT)));
+	return TWDR;
+}
