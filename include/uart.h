@@ -29,6 +29,31 @@
 #ifndef INCLUDE_UART_H_
 #define INCLUDE_UART_H_
 
+#include <inttypes.h>
 
+#define UART_RX_BUF_SIZE 32
+
+#define UART_DDR  DDRD
+#define UART_PORT PORTD
+#define UART_RX  PD0
+#define UART_TX  PD1
+
+#define BAUD 57600
+//#define BAUD 38400
+
+#define UART_DOUBLE_SPEED
+#ifdef UART_DOUBLE_SPEED
+	#define UBBR ((F_CPU/8/BAUD) - 1)
+#else
+	#define UBBR ((F_CPU/16/BAUD) - 1)
+#endif
+
+#define EMPTY_BUFFER 0
+
+void uart_init(void);
+void uart_putc(uint8_t c);
+uint8_t uart_getc(void);
+void uart_puts(uint8_t* s);
+void uart_put_bytes(uint8_t* tab, uint8_t size);
 
 #endif /* INCLUDE_UART_H_ */

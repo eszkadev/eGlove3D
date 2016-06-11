@@ -28,13 +28,36 @@
 
 #include <frame.h>
 #include <uart.h>
+#include <string.h>
+#include <util/delay.h>
+
+void send_frame(Frame* frame);
+
+Frame frame;
 
 int main(void)
 {
+	// Clear frame
+	memset(&frame, 0, sizeof(Frame));
+
+	// Initialize UART
+	uart_init();
+
 	while(1)
 	{
+		frame.PalmX = frame.PalmX + 1;
 
+		send_frame(&frame);
+
+		frame.FrameNr = frame.FrameNr + 1;
+
+		_delay_ms(39);
 	}
 
 	return 0;
+}
+
+void send_frame(Frame* frame)
+{
+	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
 }
