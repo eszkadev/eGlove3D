@@ -28,7 +28,7 @@
 
 #include <config.h>
 
-#if _PLATFORM == ATMEGA328
+#if _PLATFORM == ATMEGA16
 
 #include <twi.h>
 #include <avr/io.h>

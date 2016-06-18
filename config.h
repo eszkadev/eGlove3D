@@ -39,8 +39,9 @@
  */
 
 #define ATMEGA328 1
+#define ATMEGA16  2
 
-#define _PLATFORM ATMEGA328
+#define _PLATFORM ATMEGA16
 
 /*
  * Clock - determines the clock frequency
@@ -59,7 +60,7 @@
  *     76800
  */
 
-#define _BAUD_RATE 38400
+#define _BAUD_RATE 9600
 
 /*
  * Accelerometer - determines which model is used
