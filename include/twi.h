@@ -35,8 +35,8 @@
 
 typedef enum
 {
-	ACK,
-	NOACK
+	NOACK = 0,
+	ACK = 1
 } ack_bit;
 
 void twi_init(void);
