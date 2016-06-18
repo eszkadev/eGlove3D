@@ -26,6 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
+#include <config.h>
+
+#if _PLATFORM == ATMEGA328
+
 #include <twi.h>
 #include <avr/io.h>
 
@@ -54,7 +58,7 @@ void twi_write(uint8_t data)
 	while (!(TWCR & (1<<TWINT)));
 }
 
-uint8_t twi_read(uint8_t ack)
+uint8_t twi_read(ack_bit ack)
 {
 
 	TWCR = ack
@@ -63,3 +67,5 @@ uint8_t twi_read(uint8_t ack)
 	while (!(TWCR & (1<<TWINT)));
 	return TWDR;
 }
+
+#endif

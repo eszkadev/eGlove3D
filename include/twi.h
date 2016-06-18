@@ -33,13 +33,16 @@
 
 #define SCL_CLOCK 40000UL
 
-#define ACK 1
-#define NOACK 0
+typedef enum
+{
+	ACK,
+	NOACK
+} ack_bit;
 
 void twi_init(void);
 void twi_start(void);
 void twi_stop(void);
 void twi_write(uint8_t data);
-uint8_t twi_read(uint8_t ack);
+uint8_t twi_read(ack_bit ack);
 
 #endif /* INCLUDE_TWI_H_ */
