@@ -32,20 +32,6 @@
 #include <inttypes.h>
 #include <config.h>
 
-#define UART_RX_BUF_SIZE 32
-
-#define UART_DDR  DDRD
-#define UART_PORT PORTD
-#define UART_RX  PD0
-#define UART_TX  PD1
-
-#define UART_DOUBLE_SPEED
-#ifdef UART_DOUBLE_SPEED
-	#define UBBR ((F_CPU/8/_BAUD_RATE) - 1)
-#else
-	#define UBBR ((F_CPU/16/_BAUD_RATE) - 1)
-#endif
-
 #define EMPTY_BUFFER 0
 
 void uart_init(void);

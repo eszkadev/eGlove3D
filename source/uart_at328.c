@@ -26,9 +26,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
+#include <config.h>
+
+#if _PLATFORM == ATMEGA328
+
 #include <uart.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
+#define UART_RX_BUF_SIZE 32
+
+#define UART_DDR  DDRD
+#define UART_PORT PORTD
+#define UART_RX  PD0
+#define UART_TX  PD1
+
+#define UART_DOUBLE_SPEED
+#ifdef UART_DOUBLE_SPEED
+	#define UBBR ((F_CPU/8/_BAUD_RATE) - 1)
+#else
+	#define UBBR ((F_CPU/16/_BAUD_RATE) - 1)
+#endif
 
 volatile uint8_t uart_rx_buffer[UART_RX_BUF_SIZE];
 volatile uint8_t uart_rx_counter;
@@ -132,3 +150,5 @@ void uart_put_bytes(uint8_t* tab, uint8_t size)
 		while(!(UCSR0A & (1 << TXC0)));
 	}
 }
+
+#endif
