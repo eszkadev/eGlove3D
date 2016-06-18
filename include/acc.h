@@ -26,20 +26,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef INCLUDE_ADXL345_H_
-#define INCLUDE_ADXL345_H_
+#ifndef INCLUDE_ACC_H_
+#define INCLUDE_ACC_H_
 
 #include <inttypes.h>
 
-#define ADXLW 0xA6 //0x3A
-#define ADXLR 0xA7 //0x3B
+typedef enum
+{
+	ACC_X,
+	ACC_Y,
+	ACC_Z
+} acc_axis;
 
-#define ADXL_X 0
-#define ADXL_Y 1
-#define ADXL_Z 2
+void acc_init(void);
+uint16_t acc_receive(acc_axis reg);
 
-void adxl_init(void);
-void adxl_transmit(uint8_t reg, uint8_t value);
-uint16_t adxl_receive(uint8_t reg);
-
-#endif /* INCLUDE_ADXL345_H_ */
+#endif /* INCLUDE_ACC_H_ */

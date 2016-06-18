@@ -28,7 +28,7 @@
 
 #include <frame.h>
 #include <uart.h>
-#include <adxl345.h>
+#include <acc.h>
 #include <string.h>
 #include <util/delay.h>
 
@@ -45,15 +45,15 @@ int main(void)
 
 	// Initialize components
 	uart_init();
-	adxl_init();
+	acc_init();
 
 	while(1)
 	{
-		tmp = adxl_receive(ADXL_X);
+		tmp = acc_receive(ACC_X);
 		frame.PalmX = (tmp >> 5);
-		tmp = adxl_receive(ADXL_Y);
+		tmp = acc_receive(ACC_Y);
 		frame.PalmY = (tmp >> 5);
-		tmp = adxl_receive(ADXL_Z);
+		tmp = acc_receive(ACC_Z);
 		frame.PalmZ = (tmp >> 5);
 
 		send_frame(&frame);

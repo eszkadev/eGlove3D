@@ -36,8 +36,9 @@
 /*
  * Platform - determines which MCU is used
  * Supported values:
- * ATMEGA328
  */
+
+#define ATMEGA328 1
 
 #define _PLATFORM ATMEGA328
 
@@ -63,8 +64,9 @@
 /*
  * Accelerometer - determines which model is used
  * Supported values:
- * ADXL345
  */
+
+#define ADXL345 1
 
 #define _ACCELEROMETER ADXL345
 

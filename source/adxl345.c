@@ -26,10 +26,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <adxl345.h>
+#include <config.h>
+
+#if _ACCELEROMETER == ADXL345
+
+#include <acc.h>
 #include <twi.h>
 
-void adxl_init(void)
+#define ADXLW 0xA6 //0x3A
+#define ADXLR 0xA7 //0x3B
+
+void adxl_transmit(uint8_t reg, uint8_t value);
+
+void acc_init(void)
 {
 	twi_init();
 	// Continuous measurement
@@ -49,13 +58,13 @@ void adxl_transmit(uint8_t reg, uint8_t value)
 	twi_stop();
 }
 
-uint16_t adxl_receive(uint8_t reg)
+uint16_t acc_receive(acc_axis reg)
 {
 	uint16_t ret = 0;
 	uint16_t tmp;
 	switch (reg)
 	{
-	case ADXL_X:
+	case ACC_X:
 		twi_start();
 		twi_write(ADXLW);
 		twi_write(0x32);
@@ -72,7 +81,7 @@ uint16_t adxl_receive(uint8_t reg)
 		ret = (twi_read(NOACK) << 8) | tmp;
 		twi_stop();
 	break;
-	case ADXL_Y:
+	case ACC_Y:
 		twi_start();
 		twi_write(ADXLW);
 		twi_write(0x34);
@@ -89,7 +98,7 @@ uint16_t adxl_receive(uint8_t reg)
 		ret = (twi_read(NOACK) << 8) | tmp;
 		twi_stop();
 	break;
-	case ADXL_Z:
+	case ACC_Z:
 		twi_start();
 		twi_write(ADXLW);
 		twi_write(0x36);
@@ -109,3 +118,5 @@ uint16_t adxl_receive(uint8_t reg)
 	}
 	return ret;
 }
+
+#endif
