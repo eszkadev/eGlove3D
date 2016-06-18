@@ -31,8 +31,8 @@
 
 #include <inttypes.h>
 
-#define ADXLW 0xA6
-#define ADXLR 0xA7
+#define ADXLW 0xA6 //0x3A
+#define ADXLR 0xA7 //0x3B
 
 #define ADXL_X 0
 #define ADXL_Y 1

@@ -26,32 +26,46 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef INCLUDE_UART_H_
-#define INCLUDE_UART_H_
+#ifndef CONFIG_H_
+#define CONFIG_H_
 
-#include <inttypes.h>
-#include <config.h>
+/*
+ * Config file - describes the device configuration
+ */
 
-#define UART_RX_BUF_SIZE 32
+/*
+ * Platform - determines which MCU is used
+ * Supported values:
+ * ATMEGA328
+ */
 
-#define UART_DDR  DDRD
-#define UART_PORT PORTD
-#define UART_RX  PD0
-#define UART_TX  PD1
+#define _PLATFORM ATMEGA328
 
-#define UART_DOUBLE_SPEED
-#ifdef UART_DOUBLE_SPEED
-	#define UBBR ((F_CPU/8/_BAUD_RATE) - 1)
-#else
-	#define UBBR ((F_CPU/16/_BAUD_RATE) - 1)
-#endif
+/*
+ * Clock - determines the clock frequency
+ */
 
-#define EMPTY_BUFFER 0
+#define _CLOCK F_CPU
 
-void uart_init(void);
-void uart_putc(uint8_t c);
-uint8_t uart_getc(void);
-void uart_puts(uint8_t* s);
-void uart_put_bytes(uint8_t* tab, uint8_t size);
+/*
+ * Baud rate - determines the baud rate used to communicate with PC
+ * Supported values:
+ * clock 8 MHz:
+ *     9600
+ *     19200
+ *     38400
+ *     57600 !!! Error = 2.1 %
+ *     76800
+ */
 
-#endif /* INCLUDE_UART_H_ */
+#define _BAUD_RATE 38400
+
+/*
+ * Accelerometer - determines which model is used
+ * Supported values:
+ * ADXL345
+ */
+
+#define _ACCELEROMETER ADXL345
+
+#endif /* CONFIG_H_ */

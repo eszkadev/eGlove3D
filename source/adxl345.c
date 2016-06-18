@@ -61,7 +61,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x32);
 		twi_start();
 		twi_write(ADXLR);
-		tmp = twi_read(0);
+		tmp = twi_read(NOACK);
 		twi_stop();
 
 		twi_start();
@@ -69,7 +69,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x33);
 		twi_start();
 		twi_write(ADXLR);
-		ret = (twi_read(0) << 8) | tmp;
+		ret = (twi_read(NOACK) << 8) | tmp;
 		twi_stop();
 	break;
 	case ADXL_Y:
@@ -78,7 +78,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x34);
 		twi_start();
 		twi_write(ADXLR);
-		tmp = twi_read(0);
+		tmp = twi_read(NOACK);
 		twi_stop();
 
 		twi_start();
@@ -86,7 +86,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x35);
 		twi_start();
 		twi_write(ADXLR);
-		ret = (twi_read(0) << 8) | tmp;
+		ret = (twi_read(NOACK) << 8) | tmp;
 		twi_stop();
 	break;
 	case ADXL_Z:
@@ -95,7 +95,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x36);
 		twi_start();
 		twi_write(ADXLR);
-		tmp = twi_read(0);
+		tmp = twi_read(NOACK);
 		twi_stop();
 
 		twi_start();
@@ -103,7 +103,7 @@ uint16_t adxl_receive(uint8_t reg)
 		twi_write(0x37);
 		twi_start();
 		twi_write(ADXLR);
-		ret = (twi_read(0) << 8) | tmp;
+		ret = (twi_read(NOACK) << 8) | tmp;
 		twi_stop();
 	break;
 	}
