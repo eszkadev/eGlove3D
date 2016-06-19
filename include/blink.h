@@ -26,88 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
-#include <uart.h>
-#include <acc.h>
-#include <timer.h>
-#include <blink.h>
-#include <string.h>
-#include <util/delay.h>
+#ifndef INCLUDE_BLINK_H_
+#define INCLUDE_BLINK_H_
 
-typedef enum
-{
-	STOP,
-	RUN
-} app_state;
+void blink_init(void);
+void blink(void);
 
-void send_frame(Frame* frame);
-void timer_interrupt(void);
-
-static uint8_t timer_counter  = 0;
-app_state state = STOP;
-Frame frame;
-
-int main(void)
-{
-	volatile uint16_t tmp;
-
-	// Clear frame
-	memset(&frame, 0, sizeof(Frame));
-
-	// Initialize components
-	blink_init();
-	uart_init();
-	acc_init();
-	timer_init();
-
-	while(1)
-	{
-		if(state == RUN)
-		{
-			tmp = acc_receive(ACC_X);
-			frame.PalmX = tmp;
-			tmp = acc_receive(ACC_Y);
-			frame.PalmY = tmp;
-			tmp = acc_receive(ACC_Z);
-			frame.PalmZ = tmp;
-
-			send_frame(&frame);
-
-			frame.FrameNr = frame.FrameNr + 1;
-		}
-
-		_delay_ms(39);
-	}
-
-	return 0;
-}
-
-void send_frame(Frame* frame)
-{
-	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
-}
-
-void timer_interrupt(void)
-{
-	if(timer_counter >= 100)
-	{
-		timer_counter = 0;
-		uint8_t c = uart_getc();
-		if(c != EMPTY_BUFFER)
-		{
-			switch(c)
-			{
-			case 'R':
-				state = RUN;
-				break;
-			case 'S':
-				state = STOP;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	else
-		timer_counter++;
-}
+#endif /* INCLUDE_BLINK_H_ */

@@ -26,88 +26,32 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
-#include <uart.h>
-#include <acc.h>
+#include <config.h>
+
+#if _PLATFORM == ATMEGA16
+
 #include <timer.h>
-#include <blink.h>
-#include <string.h>
-#include <util/delay.h>
+#include <avr/io.h>
+ #include <avr/interrupt.h>
 
-typedef enum
+#define _N 1
+#define OCR0_VALUE ((_CLOCK/TIMER_INT_FREQ/2/_N)-1)
+
+extern void timer_interrupt(void);
+
+ISR(TIMER0_COMP_vect)
 {
-	STOP,
-	RUN
-} app_state;
-
-void send_frame(Frame* frame);
-void timer_interrupt(void);
-
-static uint8_t timer_counter  = 0;
-app_state state = STOP;
-Frame frame;
-
-int main(void)
-{
-	volatile uint16_t tmp;
-
-	// Clear frame
-	memset(&frame, 0, sizeof(Frame));
-
-	// Initialize components
-	blink_init();
-	uart_init();
-	acc_init();
-	timer_init();
-
-	while(1)
-	{
-		if(state == RUN)
-		{
-			tmp = acc_receive(ACC_X);
-			frame.PalmX = tmp;
-			tmp = acc_receive(ACC_Y);
-			frame.PalmY = tmp;
-			tmp = acc_receive(ACC_Z);
-			frame.PalmZ = tmp;
-
-			send_frame(&frame);
-
-			frame.FrameNr = frame.FrameNr + 1;
-		}
-
-		_delay_ms(39);
-	}
-
-	return 0;
+	timer_interrupt();
 }
 
-void send_frame(Frame* frame)
+void timer_init(void)
 {
-	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
+	OCR0 = (uint8_t)OCR0_VALUE;
+	TCNT0 = 0;
+
+	TCCR0 |= (1 << WGM01); // CTC mode
+	TCCR0 |= (1 << CS00); // No prescaling
+	TIMSK |= (1 << OCIE0); // Enable interrupt
 }
 
-void timer_interrupt(void)
-{
-	if(timer_counter >= 100)
-	{
-		timer_counter = 0;
-		uint8_t c = uart_getc();
-		if(c != EMPTY_BUFFER)
-		{
-			switch(c)
-			{
-			case 'R':
-				state = RUN;
-				break;
-			case 'S':
-				state = STOP;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	else
-		timer_counter++;
-}
+#endif
