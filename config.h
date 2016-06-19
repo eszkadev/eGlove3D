@@ -71,4 +71,13 @@
 
 #define _ACCELEROMETER ADXL345
 
+/*
+ * Magnetometer - determines which sensor is used
+ * Supported values:
+ */
+
+#define HMC5883L 1
+
+#define _MAGNETOMETER HMC5883L
+
 #endif /* CONFIG_H_ */

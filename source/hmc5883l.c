@@ -26,100 +26,76 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
-#include <uart.h>
-#include <acc.h>
+#include <config.h>
+
+#if _MAGNETOMETER == HMC5883L
+
 #include <mag.h>
-#include <timer.h>
-#include <blink.h>
-#include <string.h>
+#include <twi.h>
 #include <util/delay.h>
 
-typedef enum
+#define HMCW 0x3C
+#define HMCR 0x3D
+
+#define HMC_X 0x03
+#define HMC_Y 0x05
+#define HMC_Z 0x07
+
+#define MAGIC_NUMBER 2048
+
+
+void hmc_transmit(uint8_t address, uint8_t value)
 {
-	STOP,
-	RUN
-} app_state;
+	twi_start();
+	twi_write(HMCW);
+	twi_write(address);
+	twi_write(value);
+	twi_stop();
+}
 
-void send_frame(Frame* frame);
-void timer_interrupt(void);
-
-static uint8_t timer_counter  = 0;
-app_state state = STOP;
-Frame frame;
-
-int main(void)
+uint16_t hmc_receive(uint8_t address)
 {
-	volatile uint16_t tmp;
+	twi_start();
+	twi_write(HMCW);
+	twi_write(address);
+	twi_start();
+	twi_write(HMCR);
 
-	// Clear frame
-	memset(&frame, 0, sizeof(Frame));
+	uint16_t ret = twi_read(ACK);
+	ret = (ret << 8);
+	ret |= twi_read(NOACK);
+	twi_stop();
 
-	// Initialize components
-	blink_init();
-	uart_init();
-	acc_init();
-	mag_init();
-	timer_init();
+	return ret;
+}
 
-	while(1)
+void mag_init(void)
+{
+	hmc_transmit(0x00, 0x70);
+	hmc_transmit(0x01, 0xA0);
+	hmc_transmit(0x02, 0x00);
+
+	_delay_ms(7);
+}
+
+uint16_t mag_receive(mag_axis axis)
+{
+	uint8_t address;
+
+	switch(axis)
 	{
-		if(state == RUN)
-		{
-			tmp = acc_receive(ACC_X);
-			frame.PalmX = tmp;
-			tmp = acc_receive(ACC_Y);
-			frame.PalmY = tmp;
-			tmp = acc_receive(ACC_Z);
-			frame.PalmZ = tmp;
-
-			tmp = mag_receive(MAG_X);
-			frame.MagX1 = tmp;
-			frame.MagX2 = (tmp >> 8);
-			tmp = mag_receive(MAG_Y);
-			frame.MagY1 = tmp;
-			frame.MagY2 = (tmp >> 8);
-			tmp = mag_receive(MAG_Z);
-			frame.MagZ1 = tmp;
-			frame.MagZ2 = (tmp >> 8);
-
-			send_frame(&frame);
-
-			frame.FrameNr = frame.FrameNr + 1;
-		}
-
-		_delay_ms(39);
+	case MAG_X:
+		address = HMC_X;
+		break;
+	case MAG_Y:
+		address = HMC_Y;
+		break;
+	case MAG_Z:
+		address = HMC_Z;
+		break;
 	}
 
-	return 0;
+	return (hmc_receive(address) + MAGIC_NUMBER);
 }
 
-void send_frame(Frame* frame)
-{
-	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
-}
-
-void timer_interrupt(void)
-{
-	if(timer_counter >= 100)
-	{
-		timer_counter = 0;
-		uint8_t c = uart_getc();
-		if(c != EMPTY_BUFFER)
-		{
-			switch(c)
-			{
-			case 'R':
-				state = RUN;
-				break;
-			case 'S':
-				state = STOP;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	else
-		timer_counter++;
-}
+#endif

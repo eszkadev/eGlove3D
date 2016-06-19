@@ -26,100 +26,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#include <frame.h>
-#include <uart.h>
-#include <acc.h>
-#include <mag.h>
-#include <timer.h>
-#include <blink.h>
-#include <string.h>
-#include <util/delay.h>
+#ifndef INCLUDE_MAG_H_
+#define INCLUDE_MAG_H_
+
+#include <inttypes.h>
 
 typedef enum
 {
-	STOP,
-	RUN
-} app_state;
+	MAG_X,
+	MAG_Y,
+	MAG_Z
+} mag_axis;
 
-void send_frame(Frame* frame);
-void timer_interrupt(void);
+void mag_init(void);
+uint16_t mag_receive(mag_axis axis);
 
-static uint8_t timer_counter  = 0;
-app_state state = STOP;
-Frame frame;
-
-int main(void)
-{
-	volatile uint16_t tmp;
-
-	// Clear frame
-	memset(&frame, 0, sizeof(Frame));
-
-	// Initialize components
-	blink_init();
-	uart_init();
-	acc_init();
-	mag_init();
-	timer_init();
-
-	while(1)
-	{
-		if(state == RUN)
-		{
-			tmp = acc_receive(ACC_X);
-			frame.PalmX = tmp;
-			tmp = acc_receive(ACC_Y);
-			frame.PalmY = tmp;
-			tmp = acc_receive(ACC_Z);
-			frame.PalmZ = tmp;
-
-			tmp = mag_receive(MAG_X);
-			frame.MagX1 = tmp;
-			frame.MagX2 = (tmp >> 8);
-			tmp = mag_receive(MAG_Y);
-			frame.MagY1 = tmp;
-			frame.MagY2 = (tmp >> 8);
-			tmp = mag_receive(MAG_Z);
-			frame.MagZ1 = tmp;
-			frame.MagZ2 = (tmp >> 8);
-
-			send_frame(&frame);
-
-			frame.FrameNr = frame.FrameNr + 1;
-		}
-
-		_delay_ms(39);
-	}
-
-	return 0;
-}
-
-void send_frame(Frame* frame)
-{
-	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
-}
-
-void timer_interrupt(void)
-{
-	if(timer_counter >= 100)
-	{
-		timer_counter = 0;
-		uint8_t c = uart_getc();
-		if(c != EMPTY_BUFFER)
-		{
-			switch(c)
-			{
-			case 'R':
-				state = RUN;
-				break;
-			case 'S':
-				state = STOP;
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	else
-		timer_counter++;
-}
+#endif /* INCLUDE_MAG_H_ */
