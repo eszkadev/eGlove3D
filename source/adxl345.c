@@ -116,6 +116,7 @@ uint16_t acc_receive(acc_axis reg)
 		twi_stop();
 	break;
 	}
+	ret = (ret >> 2);
 	return ret;
 }
 
