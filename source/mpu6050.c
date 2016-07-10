@@ -26,59 +26,94 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * */
 
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#include <config.h>
 
-/*
- * Config file - describes the device configuration
- */
+#if _ACCELEROMETER == MPU6050
 
-/*
- * Platform - determines which MCU is used
- * Supported values:
- */
+#include <acc.h>
+#include <twi.h>
 
-#define ATMEGA328 1
-#define ATMEGA16  2
+#define MPUW 0xD0
+#define MPUR 0xD1
 
-#define _PLATFORM ATMEGA16
+void mpu_transmit(uint8_t reg, uint8_t value);
 
-/*
- * Clock - determines the clock frequency
- */
+void acc_init(void)
+{
+	twi_init();
+	// Wake up
+	mpu_transmit(0x6B, 0x00);
+}
 
-#define _CLOCK F_CPU
+void mpu_transmit(uint8_t reg, uint8_t value)
+{
+	twi_start();
+	twi_write(MPUW);
+	twi_write(reg);
+	twi_write(value);
+	twi_stop();
+}
 
-/*
- * Baud rate - determines the baud rate used to communicate with PC
- * Supported values:
- * clock 8 MHz:
- *     9600
- *     19200
- *     38400
- *     57600 !!! Error = 2.1 %
- *     76800
- */
+uint16_t acc_receive(acc_axis reg)
+{
+	uint16_t ret = 0;
+	uint16_t tmp;
+	switch (reg)
+	{
+	case ACC_X:
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x3B);
+		twi_start();
+		twi_write(MPUR);
+		tmp = twi_read(NOACK);
+		twi_stop();
 
-#define _BAUD_RATE 9600
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x3C);
+		twi_start();
+		twi_write(MPUR);
+		ret = (tmp << 8) | twi_read(NOACK);
+		twi_stop();
+	break;
+	case ACC_Y:
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x3D);
+		twi_start();
+		twi_write(MPUR);
+		tmp = twi_read(NOACK);
+		twi_stop();
 
-/*
- * Accelerometer - determines which model is used
- * Supported values:
- */
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x3E);
+		twi_start();
+		twi_write(MPUR);
+		ret = (tmp << 8) | twi_read(NOACK);
+		twi_stop();
+	break;
+	case ACC_Z:
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x3F);
+		twi_start();
+		twi_write(MPUR);
+		tmp = twi_read(NOACK);
+		twi_stop();
 
-#define ADXL345 1
-#define MPU6050 2
+		twi_start();
+		twi_write(MPUW);
+		twi_write(0x40);
+		twi_start();
+		twi_write(MPUR);
+		ret = (tmp << 8) | twi_read(NOACK);
+		twi_stop();
+	break;
+	}
+	ret = (ret >> 8);
+	return ret;
+}
 
-#define _ACCELEROMETER MPU6050
-
-/*
- * Magnetometer - determines which sensor is used
- * Supported values:
- */
-
-#define HMC5883L 1
-
-#define _MAGNETOMETER HMC5883L
-
-#endif /* CONFIG_H_ */
+#endif
