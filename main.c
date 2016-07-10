@@ -41,16 +41,24 @@ typedef enum
 	RUN
 } app_state;
 
-void send_frame(Frame* frame);
+void send_frame();
 void timer_interrupt(void);
 
 static uint8_t timer_counter  = 0;
 app_state state = STOP;
 Frame frame;
 
+uint8_t averaged_frames = 2;
+
 int main(void)
 {
 	volatile uint16_t tmp;
+	int8_t acc_x;
+	int8_t acc_y;
+	int8_t acc_z;
+	float averaged_palm_x = 0;
+	float averaged_palm_y = 0;
+	float averaged_palm_z = 0;
 
 	// Clear frame
 	memset(&frame, 0, sizeof(Frame));
@@ -66,12 +74,9 @@ int main(void)
 	{
 		if(state == RUN)
 		{
-			tmp = acc_receive(ACC_X);
-			frame.PalmX = tmp;
-			tmp = acc_receive(ACC_Y);
-			frame.PalmY = tmp;
-			tmp = acc_receive(ACC_Z);
-			frame.PalmZ = tmp;
+			acc_x = acc_receive(ACC_X);
+			acc_y = acc_receive(ACC_Y);
+			acc_z = acc_receive(ACC_Z);
 
 			tmp = mag_receive(MAG_X);
 			frame.MagX1 = tmp;
@@ -83,9 +88,21 @@ int main(void)
 			frame.MagZ1 = tmp;
 			frame.MagZ2 = (tmp >> 8);
 
-			send_frame(&frame);
+			frame.FrameNr++;
 
-			frame.FrameNr = frame.FrameNr + 1;
+			// Averaging
+			averaged_palm_x -= averaged_palm_x / averaged_frames;
+			averaged_palm_y -= averaged_palm_y / averaged_frames;
+			averaged_palm_z -= averaged_palm_z / averaged_frames;
+			averaged_palm_x += (float)acc_x / averaged_frames;
+			averaged_palm_y += (float)acc_y / averaged_frames;
+			averaged_palm_z += (float)acc_z / averaged_frames;
+
+			frame.PalmX = (int8_t)averaged_palm_x;
+			frame.PalmY = (int8_t)averaged_palm_y;
+			frame.PalmZ = (int8_t)averaged_palm_z;
+
+			send_frame();
 		}
 
 		_delay_ms(39);
@@ -94,9 +111,9 @@ int main(void)
 	return 0;
 }
 
-void send_frame(Frame* frame)
+inline void send_frame()
 {
-	uart_put_bytes((uint8_t*)frame, sizeof(Frame));
+	uart_put_bytes((uint8_t*)&frame, sizeof(Frame));
 }
 
 void timer_interrupt(void)
@@ -115,6 +132,19 @@ void timer_interrupt(void)
 			case 'S':
 				state = STOP;
 				break;
+
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+				// averaged_frames = 2^x
+				c -= '0';
+				averaged_frames = (1 << c);
+				break;
+
 			default:
 				break;
 			}
