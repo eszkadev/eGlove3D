@@ -29,8 +29,12 @@
 #ifndef INCLUDE_TIMER_H_
 #define INCLUDE_TIMER_H_
 
+#include <inttypes.h>
+
+// TODO: delete const value from all implementations
 #define TIMER_INT_FREQ 1000
 
 void timer_init(void);
+void timer_set_frequency(uint16_t frequency);
 
 #endif /* INCLUDE_TIMER_H_ */

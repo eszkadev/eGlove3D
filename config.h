@@ -41,7 +41,7 @@
 #define ATMEGA328 1
 #define ATMEGA16  2
 
-#define _PLATFORM ATMEGA16
+#define _PLATFORM ATMEGA328
 
 /*
  * Clock - determines the clock frequency

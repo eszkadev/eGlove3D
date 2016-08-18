@@ -118,38 +118,48 @@ inline void send_frame()
 
 void timer_interrupt(void)
 {
-	if(timer_counter >= 100)
+	uint8_t c = uart_getc();
+	if(c != EMPTY_BUFFER)
 	{
-		timer_counter = 0;
-		uint8_t c = uart_getc();
-		if(c != EMPTY_BUFFER)
+		switch(c)
 		{
-			switch(c)
-			{
-			case 'R':
-				state = RUN;
-				break;
-			case 'S':
-				state = STOP;
-				break;
+		case 'R':
+			state = RUN;
+			break;
+		case 'S':
+			state = STOP;
+			break;
 
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-				// averaged_frames = 2^x
-				c -= '0';
-				averaged_frames = (1 << c);
-				break;
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+			// averaged_frames = 2^x
+			c -= '0';
+			averaged_frames = (1 << c);
+			break;
 
-			default:
-				break;
-			}
+		case 'a':
+			timer_set_frequency(100);
+			break;
+		case 'b':
+			timer_set_frequency(50);
+			break;
+		case 'c':
+			timer_set_frequency(25);
+			break;
+		case 'd':
+			timer_set_frequency(20);
+			break;
+		case 'e':
+			timer_set_frequency(10);
+			break;
+
+		default:
+			break;
 		}
 	}
-	else
-		timer_counter++;
 }

@@ -32,10 +32,12 @@
 
 #include <timer.h>
 #include <avr/io.h>
- #include <avr/interrupt.h>
+#include <avr/interrupt.h>
 
-#define _N 1
-#define OCR0_VALUE ((_CLOCK/TIMER_INT_FREQ/2/_N)-1)
+uint16_t timer_frequency = 25;
+
+#define PRESCALE_FACTOR 1024
+#define OCR0_VALUE ((_CLOCK/timer_frequency/2/PRESCALE_FACTOR)-1)
 
 extern void timer_interrupt(void);
 
@@ -50,8 +52,17 @@ void timer_init(void)
 	TCNT0 = 0;
 
 	TCCR0A |= (1 << WGM01); // CTC mode
-	TCCR0B |= (1 << CS00); // No prescaling
+	TCCR0B |= (1 << CS00) | (1 << CS02); // prescaler clk/1024
 	TIMSK0 |= (1 << OCIE0A); // Enable interrupt
+}
+
+void timer_set_frequency(uint16_t frequency)
+{
+	timer_frequency = frequency;
+
+	cli();
+	timer_init();
+	sei();
 }
 
 #endif
