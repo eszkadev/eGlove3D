@@ -38,8 +38,8 @@
 #define HMCR 0x3D
 
 #define HMC_X 0x03
-#define HMC_Y 0x05
-#define HMC_Z 0x07
+#define HMC_Y 0x07
+#define HMC_Z 0x05
 
 #define MAGIC_NUMBER 2048
 
