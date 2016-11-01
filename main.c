@@ -44,7 +44,6 @@ typedef enum
 void send_frame();
 void timer_interrupt(void);
 
-static uint8_t timer_counter  = 0;
 app_state state = STOP;
 Frame frame;
 
@@ -52,6 +51,8 @@ uint8_t averaged_frames = 2;
 
 int main(void)
 {
+	_delay_ms(500);
+
 	volatile uint16_t tmp;
 	int8_t acc_x;
 	int8_t acc_y;
