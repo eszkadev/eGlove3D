@@ -34,7 +34,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-uint16_t timer_frequency = 25;
+volatile uint16_t timer_frequency = 25;
 
 #define PRESCALE_FACTOR 1024
 #define OCR0_VALUE ((_CLOCK/timer_frequency/2/PRESCALE_FACTOR)-1)

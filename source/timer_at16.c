@@ -37,7 +37,7 @@
 #define PRESCALE_FACTOR 256
 #define OCR0_VALUE ((_CLOCK/timer_frequency/2/PRESCALE_FACTOR)-1)
 
-uint16_t timer_frequency = 25;
+volatile uint16_t timer_frequency = 25;
 
 extern void timer_interrupt(void);
 
